@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tic Tac Toe - Classic Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #87CEEB 0%, #5ba3d9 100%);
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* main game container */
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255,255,240,0.1);
+            border-radius: 48px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            padding: 12px;
+        }
+
+        .app-card {
+            background: #f0f9ff;
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        /* pages */
+        .page {
+            padding: 22px 20px 28px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* TYPOGRAPHY */
+        h1 {
+            font-size: 2.8rem;
+            text-align: center;
+            margin: 0 0 8px 0;
+            color: #1e4a76;
+            text-shadow: 2px 2px 0 #b9e2ff;
+            letter-spacing: 2px;
+        }
+
+        .sub {
+            text-align: center;
+            color: #2c6e9e;
+            font-weight: 500;
+            margin-bottom: 28px;
+            font-size: 0.9rem;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e4a76;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 60px;
+            background: white;
+            box-shadow: inset 0 1px 3px #0001, 0 1px 2px white;
+            font-family: inherit;
+            transition: 0.2s;
+            outline: none;
+            border: 1px solid #cbd5e1;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #93c5fd;
+        }
+
+        button {
+            font-family: inherit;
+            font-weight: bold;
+            border: none;
+            border-radius: 60px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.05s linear, background 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #1e6f3f;
+            color: white;
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+
+        .btn-secondary {
+            background: #4b7b9d;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-light {
+            background: #e2e8f0;
+            color: #1f3a5f;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        /* Board */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            aspect-ratio: 1 / 1;
+            gap: 8px;
+            background: #bee0f5;
+            padding: 12px;
+            border-radius: 32px;
+            margin: 8px 0;
+        }
+
+        .cell {
+            background: #fef9e8;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.07s linear;
+            box-shadow: 0 5px 0 #b0c4de;
+            color: #1e3a8a;
+        }
+
+        .cell.X {
+            color: #0f67b3;
+            text-shadow: 1px 1px 0 #b7d0e5;
+        }
+
+        .cell.O {
+            color: #e67e22;
+            text-shadow: 1px 1px 0 #ffe0b3;
+        }
+
+        .cell.win-highlight {
+            background: #a3e4a3;
+            box-shadow: 0 0 0 2px #2ecc71;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            background: #ffffffcc;
+            margin: 12px 12px;
+            padding: 8px;
+            border-radius: 50px;
+            color: #1f6392;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            background: #ffffffaa;
+            border-radius: 40px;
+            padding: 10px 18px;
+            margin: 8px 0;
+            font-weight: bold;
+        }
+
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+
+        .diff-btn {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 8px;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .popup-card {
+            background: white;
+            width: 280px;
+            border-radius: 32px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 20px 30px black;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 12px;
+            border-bottom: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+        }
+
+        .scroll-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameRoot"></div>
+
+<script>
+    // --------------------------------------------------------------
+    //  UserManager (localStorage)
+    // --------------------------------------------------------------
+    class UserManager {
+        constructor() {
+            this.storageKey = 'tictactoe_users';
+            this.saveKey = 'game_save';
+            this.loadUsers();
+        }
+
+        loadUsers() {
+            const raw = localStorage.getItem(this.storageKey);
+            if (raw) {
+                this.users = JSON.parse(raw);
+            } else {
+                this.users = {};
+            }
+        }
+
+        saveUsers() {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.users));
+        }
+
+        registerUser(username, password) {
+            if (this.users[username]) return [false, "Username already exists!"];
+            if (username.length < 3) return [false, "Username must be at least 3 characters!"];
+            if (password.length < 4) return [false, "Password must be at least 4 characters!"];
+            this.users[username] = {
+                password: password,
+                total_score: 0,
+                games_played: 0,
+                games_won: 0,
+                games_drawn: 0,
+                join_date: new Date().toISOString().slice(0,10),
+                level: 1,
+                level_progress: 0
+            };
+            this.saveUsers();
+            return [true, "Registration successful!"];
+        }
+
+        loginUser(username, password) {
+            if (!this.users[username]) return [false, "Username not found!"];
+            if (this.users[username].password !== password) return [false, "Incorrect password!"];
+            return [true, "Login successful!"];
+        }
+
+        updateStats(username, won = false, drawn = false, xpGain = 0) {
+            if (!this.users[username]) return;
+            let user = this.users[username];
+            user.games_played++;
+            if (won) {
+                user.games_won++;
+                user.total_score += xpGain || 10;
+            } else if (drawn) {
+                user.games_drawn++;
+                user.total_score += 3;
+            }
+            // level up based on total_score: every 50 pts
+            let newLevel = 1 + Math.floor(user.total_score / 50);
+            if (newLevel > user.level) user.level = newLevel;
+            this.saveUsers();
+        }
+
+        getLeaderboard() {
+            let list = [];
+            for (let [name, data] of Object.entries(this.users)) {
+                list.push({
+                    username: name,
+                    score: data.total_score,
+                    wins: data.games_won,
+                    played: data.games_played,
+                    level: data.level
+                });
+            }
+            list.sort((a,b) => b.score - a.score);
+            return list.slice(0,10);
+        }
+
+        saveGameState(username, board, currentPlayer, gameOver, aiMode, difficulty) {
+            if (username === 'Guest') return false;
+            const save = {
+                username: username,
+                board: board,
+                current_player: currentPlayer,
+                game_over: gameOver,
+                ai_mode: aiMode,
+                difficulty: difficulty,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(this.saveKey, JSON.stringify(save));
+            return true;
+        }
+
+        loadGameState(username) {
+            const raw = localStorage.getItem(this.saveKey);
+            if (!raw) return null;
+            const data = JSON.parse(raw);
+            if (data.username === username) return data;
+            return null;
+        }
+
+        clearSave() {
+            localStorage.removeItem(this.saveKey);
+        }
+    }
+
+    // --------------------------------------------------------------
+    //  TicTacToe Logic
+    // --------------------------------------------------------------
+    class TicTacToeLogic {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.board = ['','','','','','','','',''];
+            this.currentPlayer = 'X';
+            this.gameOver = false;
+            this.winner = null;
+        }
+        makeMove(pos) {
+            if (this.gameOver) return [false, "Game is over!"];
+            if (this.board[pos] !== '') return [false, "Cell taken!"];
+            this.board[pos] = this.currentPlayer;
+            if (this.checkWin()) {
+                this.gameOver = true;
+                this.winner = this.currentPlayer;
+                return [true, `Player ${this.currentPlayer} wins!`];
+            }
+            if (this.board.every(cell => cell !== '')) {
+                this.gameOver = true;
+                return [true, "It's a draw!"];
+            }
+            this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            return [true, `${this.currentPlayer}'s turn`];
+        }
+        checkWin() {
+            const patterns = [
+                [0,1,2],[3,4,5],[6,7,8],
+                [0,3,6],[1,4,7],[2,5,8],
+                [0,4,8],[2,4,6]
+            ];
+            for (let p of patterns) {
+                if (this.board[p[0]] === this.currentPlayer &&
+                    this.board[p[1]] === this.currentPlayer &&
+                    this.board[p[2]] === this.currentPlayer)
+                    return true;
+            }
+            return false;
+        }
+        getWinningLine() {
+            const patterns = [
+                [[0,1,2],"row1"],[[3,4,5],"row2"],[[6,7,8],"row3"],
+                [[0,3,6],"col1"],[[1,4,7],"col2"],[[2,5,8],"col3"],
+                [[0,4,8],"diag1"],[[2,4,6],"diag2"]
+            ];
+            for (let [pattern] of patterns) {
+                if (this.winner && this.board[pattern[0]] === this.winner &&
+                    this.board[pattern[1]] === this.winner &&
+                    this.board[pattern[2]] === this.winner)
+                    return pattern;
+            }
+            return null;
+        }
+        loadFromSave(board, currentPlayer, gameOver) {
+            this.board = [...board];
+            this.currentPlayer = currentPlayer;
+            this.gameOver = gameOver;
+            this.winner = null;
+            if (gameOver) {
+                // determine winner if any
+                const xWin = this.checkWinnerOnBoard('X');
+                const oWin = this.checkWinnerOnBoard('O');
+                if (xWin) this.winner = 'X';
+                else if (oWin) this.winner = 'O';
+                else this.winner = null;
+            }
+        }
+        checkWinnerOnBoard(player) {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let p of patterns) {
+                if (this.board[p[0]] === player && this.board[p[1]] === player && this.board[p[2]] === player)
+                    return true;
+            }
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------
+    //  Advanced AI
+    // --------------------------------------------------------------
+    class AdvancedAI {
+        constructor(difficulty='medium') {
+            this.difficulty = difficulty;
+        }
+        setDifficulty(diff) { this.difficulty = diff; }
+        getMove(board) {
+            const empty = board.reduce((arr, cell, idx) => cell === '' ? [...arr, idx] : arr, []);
+            if (empty.length === 0) return null;
+            if (this.difficulty === 'easy') return empty[Math.floor(Math.random() * empty.length)];
+            if (this.difficulty === 'medium') return this.mediumMove(board, empty);
+            if (this.difficulty === 'hard') return this.hardMove(board, empty);
+            if (this.difficulty === 'expert') return this.expertMove(board, empty);
+            return empty[0];
+        }
+        mediumMove(board, empty) {
+            // win
+            for (let pos of empty) {
+                let copy = [...board]; copy[pos] = 'O';
+                if (this.wins(copy, 'O')) return pos;
+            }
+            // block
+            for (let pos of empty) {
+                let copy = [...board]; copy[pos] = 'X';
+                if (this.wins(copy, 'X')) return pos;
+            }
+            return empty[Math.floor(Math.random() * empty.length)];
+        }
+        hardMove(board, empty) {
+            for (let pos of empty) {
+                let copy = [...board]; copy[pos] = 'O';
+                if (this.wins(copy, 'O')) return pos;
+            }
+            for (let pos of empty) {
+                let copy = [...board]; copy[pos] = 'X';
+                if (this.wins(copy, 'X')) return pos;
+            }
+            if (empty.includes(4)) return 4;
+            const corners = [0,2,6,8].filter(c => empty.includes(c));
+            if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+            return empty[0];
+        }
+        expertMove(board, empty) {
+            let bestScore = -Infinity;
+            let bestMove = null;
+            for (let pos of empty) {
+                let copy = [...board]; copy[pos] = 'O';
+                let score = this.minimax(copy, 0, false);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = pos;
+                }
+            }
+            return bestMove !== null ? bestMove : empty[0];
+        }
+        minimax(board, depth, isMax) {
+            if (this.wins(board, 'O')) return 10 - depth;
+            if (this.wins(board, 'X')) return -10 + depth;
+            if (board.every(c => c !== '')) return 0;
+            if (isMax) {
+                let best = -Infinity;
+                for (let i=0;i<9;i++) {
+                    if (board[i] === '') {
+                        let copy = [...board]; copy[i] = 'O';
+                        best = Math.max(best, this.minimax(copy, depth+1, false));
+                    }
+                }
+                return best;
+            } else {
+                let best = Infinity;
+                for (let i=0;i<9;i++) {
+                    if (board[i] === '') {
+                        let copy = [...board]; copy[i] = 'X';
+                        best = Math.min(best, this.minimax(copy, depth+1, true));
+                    }
+                }
+                return best;
+            }
+        }
+        wins(board, player) {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return patterns.some(p => p.every(idx => board[idx] === player));
+        }
+    }
+
+    // --------------------------------------------------------------
+    //  APP STATE & RENDER (Vanilla JS)
+    // --------------------------------------------------------------
+    let appState = {
+        currentPage: 'login',   // login, register, game
+        userManager: new UserManager(),
+        currentUser: null,
+        isGuest: false,
+        gameLogic: new TicTacToeLogic(),
+        ai: new AdvancedAI('medium'),
+        aiMode: true,
+        currentDifficulty: 'medium',
+        currentScore: 0,
+        currentXP: 0,
+        currentLevel: 1,
+        levelMsgFlag: false
+    };
+
+    // Helper: update stats display after loading
+    function loadUserStats() {
+        if (appState.isGuest || !appState.currentUser) return;
+        const user = appState.userManager.users[appState.currentUser];
+        if (user) {
+            appState.currentScore = user.total_score;
+            appState.currentLevel = user.level;
+            appState.currentXP = user.total_score;
+        }
+    }
+
+    function saveUserStatsAfterGame(won, drawn, xpEarned = 0) {
+        if (appState.isGuest || !appState.currentUser) return;
+        appState.userManager.updateStats(appState.currentUser, won, drawn, xpEarned);
+        loadUserStats();
+        renderGameScreen(); // refresh header
+    }
+
+    function updateScoreAndLevel(xpAdded, isWin = false) {
+        appState.currentScore += xpAdded;
+        appState.currentXP += xpAdded;
+        let newLevel = 1 + Math.floor(appState.currentScore / 50);
+        if (newLevel > appState.currentLevel) {
+            appState.currentLevel = newLevel;
+            if (!appState.levelMsgFlag) {
+                appState.levelMsgFlag = true;
+                showPopupMessage(`⭐ LEVEL ${newLevel}! ⭐`, 1200);
+                setTimeout(() => { appState.levelMsgFlag = false; }, 1500);
+            }
+        }
+        renderGameScreen();  // update header xp/level
+    }
+
+    function showPopupMessage(msg, duration = 2000) {
+        const existing = document.querySelector('.popup-overlay');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.className = 'popup-overlay';
+        overlay.innerHTML = `<div class="popup-card"><p style="font-weight:bold;">${msg}</p><button id="popupClose" class="btn-primary" style="margin-top:10px;">OK</button></div>`;
+        document.body.appendChild(overlay);
+        const closeBtn = overlay.querySelector('#popupClose');
+        const close = () => overlay.remove();
+        closeBtn.onclick = close;
+        if (duration > 0) setTimeout(close, duration);
+    }
+
+    // render functions
+    function renderLoginPage() {
+        const root = document.getElementById('gameRoot');
+        root.innerHTML = `
+            <div class="app-card">
+                <div class="page">
+                    <h1>TIC TAC TOE</h1>
+                    <div class="sub">Login or Register</div>
+                    <div class="input-group"><label>Username</label><input id="loginUser" type="text" placeholder="username"></div>
+                    <div class="input-group"><label>Password</label><input id="loginPass" type="password" placeholder="****"></div>
+                    <button id="doLoginBtn" class="btn-primary">LOGIN</button>
+                    <div class="flex-row"><button id="gotoRegisterBtn" class="btn-secondary" style="flex:1">REGISTER</button><button id="guestBtn" class="btn-warning" style="flex:1">PLAY AS GUEST</button></div>
+                </div>
+            </div>
+        `;
+        document.getElementById('doLoginBtn').onclick = () => {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            if (!user || !pass) { showPopupMessage("Enter username & password"); return; }
+            const [ok, msg] = appState.userManager.loginUser(user, pass);
+            if (ok) {
+                appState.currentUser = user;
+                appState.isGuest = false;
+                loadUserStats();
+                startGameSession();
+            } else showPopupMessage(msg);
+        };
+        document.getElementById('gotoRegisterBtn').onclick = () => renderRegisterPage();
+        document.getElementById('guestBtn').onclick = () => {
+            appState.currentUser = "Guest";
+            appState.isGuest = true;
+            appState.currentScore = 0;
+            appState.currentXP = 0;
+            appState.currentLevel = 1;
+            startGameSession();
+        };
+    }
+
+    function renderRegisterPage() {
+        const root = document.getElementById('gameRoot');
+        root.innerHTML = `
+            <div class="app-card">
+                <div class="page">
+                    <h1>REGISTER</h1>
+                    <div class="input-group"><label>Username (min 3)</label><input id="regUser" placeholder="username"></div>
+                    <div class="input-group"><label>Password (min 4)</label><input id="regPass" type="password"></div>
+                    <div class="input-group"><label>Confirm</label><input id="regConfirm" type="password"></div>
+                    <button id="doRegBtn" class="btn-primary">CREATE ACCOUNT</button>
+                    <button id="backLoginBtn" class="btn-light" style="margin-top:15px;">BACK TO LOGIN</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('doRegBtn').onclick = () => {
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const conf = document.getElementById('regConfirm').value;
+            if (!user || !pass) { showPopupMessage("Fill all fields"); return; }
+            if (pass !== conf) { showPopupMessage("Passwords do not match"); return; }
+            const [ok, msg] = appState.userManager.registerUser(user, pass);
+            if (ok) {
+                showPopupMessage("Registered! Please login.");
+                renderLoginPage();
+            } else showPopupMessage(msg);
+        };
+        document.getElementById('backLoginBtn').onclick = () => renderLoginPage();
+    }
+
+    function startGameSession() {
+        // reset game state
+        appState.gameLogic.reset();
+        appState.aiMode = true;
+        appState.currentDifficulty = 'medium';
+        appState.ai.setDifficulty('medium');
+        appState.gameLogic.gameOver = false;
+        // check for saved game
+        if (!appState.isGuest) {
+            const saved = appState.userManager.loadGameState(appState.currentUser);
+            if (saved && !saved.game_over) {
+                showResumePopup(saved);
+                return;
+            }
+        }
+        renderGameScreen();
+    }
+
+    function showResumePopup(saved) {
+        const overlay = document.createElement('div');
+        overlay.className = 'popup-overlay';
+        overlay.innerHTML = `
+            <div class="popup-card">
+                <h3>Resume saved game?</h3>
+                <div class="flex-row" style="margin-top: 20px;">
+                    <button id="resumeYes" class="btn-primary">RESUME</button>
+                    <button id="resumeNo" class="btn-danger">NEW GAME</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.querySelector('#resumeYes').onclick = () => {
+            appState.gameLogic.loadFromSave(saved.board, saved.current_player, saved.game_over);
+            appState.aiMode = saved.ai_mode;
+            appState.currentDifficulty = saved.difficulty || 'medium';
+            appState.ai.setDifficulty(appState.currentDifficulty);
+            overlay.remove();
+            renderGameScreen();
+        };
+        overlay.querySelector('#resumeNo').onclick = () => {
+            appState.userManager.clearSave();
+            overlay.remove();
+            renderGameScreen();
+        };
+    }
+
+    function makeMove(position) {
+        const logic = appState.gameLogic;
+        if (logic.gameOver) { showPopupMessage("Game over! Press NEW GAME"); return; }
+        if (logic.board[position] !== '') return;
+        const beforePlayer = logic.currentPlayer;
+        const [success, msg] = logic.makeMove(position);
+        if (!success) return;
+        renderGameBoardUI();
+        document.getElementById('statusMsg').innerText = msg;
+        if (logic.gameOver) {
+            handleGameOver(beforePlayer);
+            return;
+        }
+        if (appState.aiMode && !logic.gameOver && logic.currentPlayer === 'O') {
+            setTimeout(() => aiMove(), 180);
+        }
+    }
+
+    function aiMove() {
+        if (appState.gameLogic.gameOver) return;
+        if (appState.gameLogic.currentPlayer !== 'O') return;
+        const pos = appState.ai.getMove(appState.gameLogic.board);
+        if (pos !== undefined && pos !== null) makeMove(pos);
+    }
+
+    function handleGameOver(winnerPlayer) {
+        const logic = appState.gameLogic;
+        let xpGain = 0;
+        let wonFlag = false, drawFlag = false;
+        if (logic.winner === 'X') {
+            const mult = { easy:1, medium:1.5, hard:2, expert:2.5 };
+            xpGain = Math.floor(10 * (mult[appState.currentDifficulty] || 1));
+            updateScoreAndLevel(xpGain, true);
+            wonFlag = true;
+            saveUserStatsAfterGame(true, false, xpGain);
+            showPopupMessage(`✨ YOU WIN! +${xpGain} XP (${appState.currentDifficulty.toUpperCase()}) ✨`);
+            const line = logic.getWinningLine();
+            if (line) highlightWinLine(line);
+            if (!appState.isGuest) appState.userManager.clearSave();
+        } else if (logic.winner === 'O') {
+            saveUserStatsAfterGame(false, false);
+            showPopupMessage(`🤖 AI WINS! (${appState.currentDifficulty.toUpperCase()})`);
+            const line = logic.getWinningLine();
+            if (line) highlightWinLine(line);
+            if (!appState.isGuest) appState.userManager.clearSave();
+        } else {
+            // draw
+            updateScoreAndLevel(3, false);
+            drawFlag = true;
+            saveUserStatsAfterGame(false, true);
+            showPopupMessage(`🤝 DRAW! +3 XP`);
+            if (!appState.isGuest) appState.userManager.clearSave();
+        }
+        renderGameScreen();
+    }
+
+    function highlightWinLine(positions) {
+        for (let idx of positions) {
+            const cellDiv = document.getElementById(`cell-${idx}`);
+            if (cellDiv) cellDiv.classList.add('win-highlight');
+        }
+    }
+
+    function renderGameBoardUI() {
+        const boardContainer = document.getElementById('boardContainer');
+        if (!boardContainer) return;
+        const logic = appState.gameLogic;
+        let html = `<div class="board">`;
+        for (let i=0; i<9; i++) {
+            const val = logic.board[i];
+            const symbolClass = val === 'X' ? 'X' : (val === 'O' ? 'O' : '');
+            html += `<div class="cell ${symbolClass}" data-pos="${i}" id="cell-${i}">${val}</div>`;
+        }
+        html += `</div>`;
+        boardContainer.innerHTML = html;
+        for (let i=0; i<9; i++) {
+            document.getElementById(`cell-${i}`).onclick = (() => makeMove(i));
+        }
+    }
+
+    function renderGameScreen() {
+        const root = document.getElementById('gameRoot');
+        const score = appState.currentScore;
+        const xp = appState.currentXP;
+        const lvl = appState.currentLevel;
+        const username = appState.currentUser;
+        const guestMark = appState.isGuest ? ' (Guest)' : '';
+        const aiToggleText = appState.aiMode ? 'AI:ON' : 'AI:OFF';
+        const aiColor = appState.aiMode ? '#2ecc71' : '#e67e22';
+
+        root.innerHTML = `
+            <div class="app-card">
+                <div class="page" style="padding: 16px;">
+                    <div class="stats-row">
+                        <div><strong>${username}${guestMark}</strong><br><span style="font-size:12px;">LVL ${lvl}</span></div>
+                        <div>🏆 ${score}<br><span style="font-size:10px;">XP ${xp}</span></div>
+                        <button id="exitGameBtn" style="background:#c0392b; color:white; padding:6px 12px;">EXIT</button>
+                    </div>
+                    <div id="boardContainer"></div>
+                    <div class="status" id="statusMsg">${appState.gameLogic.gameOver ? 'GAME OVER' : (appState.gameLogic.currentPlayer + "'s TURN")}</div>
+                    <div class="button-grid">
+                        <button id="resetBtn" class="btn-primary">🔄 NEW</button>
+                        <button id="aiToggleBtn" style="background:${aiColor}; color:white; font-weight:bold;">${aiToggleText}</button>
+                        <button id="forceAiBtn" class="btn-secondary" ${(!appState.aiMode && !appState.gameLogic.gameOver) ? '' : 'disabled'}>🤖 AIMOVE</button>
+                    </div>
+                    <div class="button-grid">
+                        <button class="diff-btn" data-diff="easy">EASY</button>
+                        <button class="diff-btn" data-diff="medium">MEDIUM</button>
+                        <button class="diff-btn" data-diff="hard">HARD</button>
+                        <button class="diff-btn" data-diff="expert">EXPERT</button>
+                    </div>
+                    <div class="button-grid">
+                        <button id="statsBtn" class="btn-light">📊 MY STATS</button>
+                        <button id="leaderBtn" class="btn-light">🏅 LEADERBOARD</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        renderGameBoardUI();
+        document.getElementById('exitGameBtn').onclick = () => {
+            if (!appState.isGuest && !appState.gameLogic.gameOver) {
+                appState.userManager.saveGameState(appState.currentUser, appState.gameLogic.board, appState.gameLogic.currentPlayer, appState.gameLogic.gameOver, appState.aiMode, appState.currentDifficulty);
+            }
+            appState.currentUser = null;
+            renderLoginPage();
+        };
+        document.getElementById('resetBtn').onclick = () => {
+            appState.gameLogic.reset();
+            appState.gameLogic.gameOver = false;
+            renderGameScreen();
+            if (!appState.isGuest) appState.userManager.clearSave();
+        };
+        document.getElementById('aiToggleBtn').onclick = () => {
+            appState.aiMode = !appState.aiMode;
+            renderGameScreen();
+        };
+        const forceBtn = document.getElementById('forceAiBtn');
+        if (forceBtn) forceBtn.onclick = () => { if (!appState.aiMode && !appState.gameLogic.gameOver && appState.gameLogic.currentPlayer === 'O') aiMove(); };
+        const diffBtns = document.querySelectorAll('.diff-btn');
+        diffBtns.forEach(btn => {
+            btn.onclick = () => {
+                const diff = btn.getAttribute('data-diff');
+                appState.currentDifficulty = diff;
+                appState.ai.setDifficulty(diff);
+                showPopupMessage(`Difficulty: ${diff.toUpperCase()}`, 800);
+                appState.gameLogic.reset();
+                renderGameScreen();
+            };
+        });
+        document.getElementById('statsBtn').onclick = () => showStatsPopup();
+        document.getElementById('leaderBtn').onclick = () => showLeaderboardPopup();
+    }
+
+    function showStatsPopup() {
+        if (appState.isGuest) {
+            showPopupMessage("Guest stats are not saved. Login to track!");
+            return;
+        }
+        const user = appState.userManager.users[appState.currentUser];
+        if (!user) return;
+        const winRate = user.games_played ? ((user.games_won / user.games_played)*100).toFixed(0) : 0;
+        const msg = `${appState.currentUser.toUpperCase()}\nLevel: ${user.level}\nPlayed: ${user.games_played}\nWon: ${user.games_won}\nDrawn: ${user.games_drawn}\nScore: ${user.total_score}\nWin Rate: ${winRate}%`;
+        alert(msg); // simple but works, or custom popup
+    }
+
+    function showLeaderboardPopup() {
+        const top = appState.userManager.getLeaderboard();
+        let text = "🏆 LEADERBOARD 🏆\n";
+        top.forEach((p, i) => {
+            text += `${i+1}. ${p.username}  Lv${p.level}  ${p.score} pts\n`;
+        });
+        alert(text);
+    }
+
+    function renderPageByState() {
+        if (appState.currentUser === null) renderLoginPage();
+        else renderGameScreen();
+    }
+
+    // Start
+    renderPageByState();
+</script>
+</body>
+</html>
